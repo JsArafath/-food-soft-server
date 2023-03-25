@@ -5,7 +5,7 @@ const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const app = express()
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
 // middleware 
 app.use(cors());
@@ -18,15 +18,15 @@ async function run() {
     try {
       await client.connect();
       const database = client.db("motors");
-       const carscollection = database.collection("cars");
+       const productscollection = database.collection("products");
        const specialcollection = database.collection("special");
         const bookingcollection = database.collection("booking");
          const userscollection = database.collection("users");
          const reviewCollection = database.collection("reviews");
    
       // GET API FOR SHOWING ALL clocks
-app.get('/cars', async(req, res) => {
-    const cursor = carscollection.find({});
+app.get('/products', async(req, res) => {
+    const cursor = productscollection.find({});
     const hotels = await cursor.toArray();
     res.send(hotels);
 })
@@ -51,14 +51,14 @@ if(email){
 })
 
 // GET API FOR SHOWING INDIVIDUAL ROOM DETAILS 
-app.get('/cars/:id', async(req,res)=>{
+app.get('/products/:id', async(req,res)=>{
   const id = req.params.id;
   const query = {_id:ObjectId(id)};
-  const hotel = await carscollection.findOne(query);
+  const hotel = await productscollection.findOne(query);
   res.json(hotel);
 })
 
-app.get('/cars/:id', async(req,res)=>{
+app.get('/products/:id', async(req,res)=>{
   const id = req.params.id;
   const payment = req.body;
   const filter = {_id:ObjectId(id)};
@@ -67,7 +67,7 @@ app.get('/cars/:id', async(req,res)=>{
       payment:payment
     }
   };
-  const result = await carscollection.findOne(updateDoc);
+  const result = await productscollection.findOne(updateDoc);
   res.json(result);
 })
 
@@ -87,9 +87,9 @@ app.post('/reviews', async(req,res)=>{
 });
 
 //   POST API TO ADD clock 
-app.post('/cars', async(req, res) => {
+app.post('/products', async(req, res) => {
     const newhotel = req.body; 
-    const result = await carscollection.insertOne(newhotel);
+    const result = await productscollection.insertOne(newhotel);
     console.log('hitting the post',req.body);
     console.log('added hotel', result)
     res.json(result);
